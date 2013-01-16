@@ -1,0 +1,36 @@
+name: CustomSpawnersEco
+version: 0.1
+author: thebiologist13
+description: Add economy properties to CustomSpawners.
+main: com.github.thebiologist13.CustomSpawnersEco
+depend: [CustomSpawners, Vault]
+loadbefore: [CustomSpawners, Vault]
+commands:
+    customspawnerseco:
+        description: Main CustomSpawnersEco command.
+        usage: This command is used by /customspawnerseco.
+        aliases: [cseco, csplugineco]
+        permission: customspawnerseco.customspawnerseco
+        permission-message: You do not have permission to use the customspawnerseco command.
+permissions:
+    customspawnerseco.*:
+        description: All CustomSpawnersEco commands.
+        default: op
+        children:
+            customspawnerseco.customspawnerseco: true
+            customspawnerseco.buy: true
+            customspawnerseco.sell: true
+            customspawnerseco.worth: true
+            customspawnerseco.setworth: true
+    customspawnerseco.buy:
+        description: Allows the user/group to buy CustomSpawners.
+        default: true
+    customspawners.sell:
+        description: Allows the user/group to sell CustomSpawners.
+        default: true
+    customspawners.worth:
+        description: Allows the user/group to see the price of a spawner.
+        default: true
+    customspawners.setworth:
+        description: Allows the user/group to set the price of a spawner.
+        default: op

@@ -1,17 +1,19 @@
 package com.github.thebiologist13;
 
-import net.minecraft.server.v1_4_6.NBTTagCompound;
-import net.minecraft.server.v1_4_6.TileEntity;
-import net.minecraft.server.v1_4_6.TileEntityMobSpawner;
+import net.minecraft.server.v1_4_R1.NBTTagCompound;
+import net.minecraft.server.v1_4_R1.TileEntity;
+import net.minecraft.server.v1_4_R1.TileEntityMobSpawner;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.thebiologist13.nbt.NBTManager;
 import com.github.thebiologist13.nbt.NotTileEntityException;
@@ -30,25 +32,21 @@ public class SpawnerPlaceEvent implements Listener {
 	public void onPlace(BlockPlaceEvent ev) {
 		ItemStack stack = ev.getItemInHand();
 		Block block = ev.getBlock();
+		
+		if(!block.getType().equals(Material.MOB_SPAWNER)) {
+			return;
+		}
+		
 		Player p = ev.getPlayer();
+		ItemMeta meta = stack.getItemMeta();
 		
-		if(stack.getItemMeta() == null) {
+		if(meta.getLore().size() < 1) {
 			return;
 		}
 		
-		String name = stack.getItemMeta().getLore().get(0);
-		
-		if(!name.endsWith("CustomSpawners Spawner")) {
-			return;
-		}
-		
-		int dashIndex = name.indexOf("-");
-		String id = name.substring(0, dashIndex - 1);
-		
-		Spawner spawner = CustomSpawners.getSpawner(id);
+		Spawner spawner = CSE.getFromLore(meta);
 		
 		if(spawner == null) {
-			PLUGIN.printDebugMessage("No spawner with ID: \"" + id + "\"");
 			return;
 		}
 		
@@ -62,15 +60,16 @@ public class SpawnerPlaceEvent implements Listener {
 		}
 		
 		Spawner spawner1 = PLUGIN.cloneWithNewId(spawner);
-		spawner1.setActive(false);
 		spawner1.setName("");
 		spawner1.setLoc(block.getLocation());
-		CustomSpawners.spawners.put(spawner1.getId(), spawner1);
+		
+		PLUGIN.getFileManager().autosave(spawner1);
 		
 		try {
 			NBTTagCompound comp = nbt.getSpawnerNBT(spawner1);
 			
 			if(comp == null) {
+				PLUGIN.printDebugMessage("Null NBT");
 				return;
 			}
 			

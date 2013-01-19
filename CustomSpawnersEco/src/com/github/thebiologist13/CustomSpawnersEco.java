@@ -7,6 +7,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -115,6 +116,19 @@ public class CustomSpawnersEco extends JavaPlugin {
         }
 
         return null;
+	}
+	
+	public Spawner getFromLore(ItemMeta meta) {
+		String name = meta.getLore().get(0);
+		
+		if(!name.endsWith("CustomSpawners Spawner")) {
+			return null;
+		}
+		
+		int dashIndex = name.indexOf("-");
+		String id = name.substring(2, dashIndex - 1);
+		
+		return CustomSpawners.getSpawner(id);
 	}
 	
 	public CustomSpawners getCustomSpawners() {

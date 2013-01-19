@@ -22,6 +22,8 @@ public class EcoCommandExecutor extends EconomyExecutor implements CommandExecut
 		EcoSubCommand worth = new WorthCommand(plugin, "customspawnerseco.worth");
 		EcoSubCommand setWorth = new SetWorthCommand(plugin, "customspawnerseco.setworth");
 		
+		sell.setNeedsObject(false);
+		
 		addCommand("buy", buy, new String[] {
 				"purchase",
 				"accquire",
@@ -49,6 +51,23 @@ public class EcoCommandExecutor extends EconomyExecutor implements CommandExecut
 
 		if(arg1.getName().equalsIgnoreCase("customspawnerseco")) {
 			
+			if(arg3.length == 0) {
+				String version = CSE.getDescription().getVersion();
+				String[] info = 
+					{
+						ChatColor.GREEN + "* * * CustomSpawnersEco v" +  ChatColor.GOLD + version + ChatColor.GREEN  + " by thebiologist13 * * *",
+						ChatColor.GREEN + "CustomSpawners on BukkitDev:",
+						ChatColor.AQUA + "http://dev.bukkit.org/server-mods/customspawners",
+						ChatColor.GREEN + "CustomSpawnersEco on BukkitDev:",
+						ChatColor.AQUA + "http://dev.bukkit.org/server-mods/customspawnerseco",
+						ChatColor.GREEN + "thebiologist13 on BukkitDev:",
+						ChatColor.AQUA + "http://dev.bukkit.org/profiles/thebiologist13",
+						ChatColor.GREEN + "* * * * * * * * * * * * * * * *"
+					};
+				CSE.sendMessage(arg0, info);
+				return true;
+			}
+			
 			Spawner spawnerRef = null;
 			String sub = arg3[0].toLowerCase();
 			String objId = "";
@@ -56,11 +75,6 @@ public class EcoCommandExecutor extends EconomyExecutor implements CommandExecut
 			
 			if(arg3.length > 1)
 				objId = arg3[1];
-
-			if(arg3.length == 0) {
-				CSE.sendMessage(arg0, ChatColor.RED + "You must enter a command.");
-				return true;
-			}
 			
 			EcoSubCommand cmd = (EcoSubCommand) super.getCommand(sub);
 			

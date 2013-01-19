@@ -24,23 +24,31 @@ public class SellCommand extends EcoSubCommand {
 		
 		Player p = (Player) sender;
 		
-		if(!hasWorth(spawner)) {
+		String playerName = p.getName();
+		
+		PlayerInventory inv = p.getInventory();
+		
+		Spawner spawner1 = CSE.getFromLore(inv.getItemInHand().getItemMeta());
+		
+		if(spawner1 == null) {
+			CSE.sendMessage(p, ChatColor.RED + "You must be holding a spawner.");
+			return;
+		}
+		
+		if(!hasWorth(spawner1)) {
 			CSE.sendMessage(p, NO_VALUE);
 			return;
 		}
 		
-		double price = getWorth(spawner);
-		
-		String playerName = p.getName();
+		double price = getWorth(spawner1);
 		
 		ECO.depositPlayer(playerName, price);
 		
-		PlayerInventory inv = p.getInventory();
 		inv.clear(inv.getHeldItemSlot());
 		
 		CSE.sendMessage(p, ChatColor.GREEN + "Sold a " + ChatColor.GOLD + 
-				PLUGIN.getFriendlyName(spawner) + ChatColor.GREEN + " for " + 
-				ChatColor.GOLD + getPriceString(spawner) + ChatColor.GREEN + ".");
+				PLUGIN.getFriendlyName(spawner1) + ChatColor.GREEN + " for " + 
+				ChatColor.GOLD + getPriceString(spawner1) + ChatColor.GREEN + ".");
 		
 	}
 	

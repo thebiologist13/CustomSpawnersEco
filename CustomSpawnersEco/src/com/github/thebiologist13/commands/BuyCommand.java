@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.thebiologist13.CustomSpawnersEco;
 import com.github.thebiologist13.Spawner;
@@ -48,14 +49,16 @@ public class BuyCommand extends EcoSubCommand {
 		ECO.withdrawPlayer(playerName, price);
 		
 		ItemStack stack = new ItemStack(Material.MOB_SPAWNER);
+		ItemMeta meta = stack.getItemMeta();
 		
 		String spawnerName = PLUGIN.getFriendlyName(spawner);
 		List<String> lore = new ArrayList<String>();
-		lore.add(spawner.getId() + " - CustomSpawners Spawner");
+		lore.add(ChatColor.AQUA + "" + spawner.getId() + " - CustomSpawners Spawner");
 		
-		stack.getItemMeta().setDisplayName(ChatColor.GREEN + spawnerName + " Spawner");
-		stack.getItemMeta().setLore(lore);
+		meta.setDisplayName(ChatColor.GREEN + spawnerName + " Spawner");
+		meta.setLore(lore);
 		
+		stack.setItemMeta(meta);
 		p.getInventory().addItem(stack);
 		
 		CSE.sendMessage(p, ChatColor.GREEN + "Purchased new " + ChatColor.GOLD + 

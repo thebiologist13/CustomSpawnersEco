@@ -3,8 +3,6 @@ version: 0.1
 author: thebiologist13
 description: Add economy properties to CustomSpawners.
 main: com.github.thebiologist13.CustomSpawnersEco
-depend: [CustomSpawners, Vault]
-loadbefore: [CustomSpawners, Vault]
 commands:
     customspawnerseco:
         description: Main CustomSpawnersEco command.

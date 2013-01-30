@@ -1,19 +1,31 @@
 package com.github.thebiologist13;
 
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
+import net.minecraft.server.v1_4_R1.NBTTagCompound;
+import net.minecraft.server.v1_4_R1.TileEntity;
+import net.minecraft.server.v1_4_R1.TileEntityMobSpawner;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.thebiologist13.nbt.NBTManager;
+import com.github.thebiologist13.nbt.NotTileEntityException;
+
 public class CustomSpawnersEco extends JavaPlugin {
 
+	public static ConcurrentHashMap<Location, Spawner> toApply = new ConcurrentHashMap<Location, Spawner>();
+	
 	private Economy economy = null;
 	
 	private CustomSpawners customSpawners = null;
@@ -32,6 +44,7 @@ public class CustomSpawnersEco extends JavaPlugin {
 		
 		if(economy == null) {
 			sendMessage(log, "Cannot load CustomSpawnersEco: No Vault detected for economy services.");
+			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
 		
@@ -39,12 +52,55 @@ public class CustomSpawnersEco extends JavaPlugin {
 		
 		if(customSpawners == null) {
 			sendMessage(log, "Cannot load CustomSpawnersEco: No CustomSpawners detected for spawner services.");
+			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
 		
 		getCommand("customspawnerseco").setExecutor(new EcoCommandExecutor(this));
 		
 		getServer().getPluginManager().registerEvents(new SpawnerPlaceEvent(this), this);
+		
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+
+			@Override
+			public void run() {
+				
+				Iterator<Location> apply = toApply.keySet().iterator();
+				while(apply.hasNext()) {
+					Location l = apply.next();
+					
+					NBTManager nbt = new NBTManager();
+					CraftWorld cw = (CraftWorld) l.getWorld();
+					TileEntity te = cw.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+					
+					if(!(te instanceof TileEntityMobSpawner)) {
+						l.getBlock().setTypeIdAndData(52, (byte) 0, true);
+						te = cw.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+					}
+					
+					try {
+						NBTTagCompound comp = nbt.getSpawnerNBT(toApply.get(l));
+						
+						if(comp == null) {
+							continue;
+						}
+						
+						nbt.setTileEntityMobSpawnerNBT(l.getBlock(), comp);
+						toApply.remove(l);
+						
+					} catch (NotTileEntityException e) {
+						
+						customSpawners.printDebugMessage(e.getMessage(), this.getClass());
+						sendMessage(log, ChatColor.RED + "Could not find mob spawner block. Please report this to plugin author.");
+						continue;
+						
+					}
+					
+				}
+				
+			}
+			
+		}, 0, 1);
 		
 		sendMessage(log, "CustomSpawnersEco by thebiologist13 enabled!");
 	}

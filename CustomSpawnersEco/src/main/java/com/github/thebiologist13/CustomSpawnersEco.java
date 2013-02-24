@@ -40,20 +40,24 @@ public class CustomSpawnersEco extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		
-		economy = getEconomy();
-		
-		if(economy == null) {
-			sendMessage(log, "Cannot load CustomSpawnersEco: No Vault detected for economy services.");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
+		try {
+			economy = getEconomy();
+		} finally {
+			if(economy == null) {
+				sendMessage(log, "Cannot load CustomSpawnersEco: No Vault detected for economy services.");
+				getServer().getPluginManager().disablePlugin(this);
+				return;
+			}
 		}
 		
-		customSpawners = getCustomSpawners();
-		
-		if(customSpawners == null) {
-			sendMessage(log, "Cannot load CustomSpawnersEco: No CustomSpawners detected for spawner services.");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
+		try {
+			customSpawners = getCustomSpawners();
+		} finally {
+			if(customSpawners == null) {
+				sendMessage(log, "Cannot load CustomSpawnersEco: No CustomSpawners detected for spawner services.");
+				getServer().getPluginManager().disablePlugin(this);
+				return;
+			}
 		}
 		
 		getCommand("customspawnerseco").setExecutor(new EcoCommandExecutor(this));

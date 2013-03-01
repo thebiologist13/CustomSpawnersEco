@@ -5,22 +5,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_4_R1.NBTTagCompound;
-import net.minecraft.server.v1_4_R1.TileEntity;
-import net.minecraft.server.v1_4_R1.TileEntityMobSpawner;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.thebiologist13.nbt.NBTManager;
-import com.github.thebiologist13.nbt.NotTileEntityException;
+import com.github.thebiologist13.api.IConverter;
+import com.github.thebiologist13.api.ISpawner;
 
 public class CustomSpawnersEco extends JavaPlugin {
 
@@ -73,33 +69,11 @@ public class CustomSpawnersEco extends JavaPlugin {
 				while(apply.hasNext()) {
 					Location l = apply.next();
 					
-					NBTManager nbt = new NBTManager();
-					CraftWorld cw = (CraftWorld) l.getWorld();
-					TileEntity te = cw.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+					ISpawner spawner = CustomSpawners.getSpawnerAt(l);
+					IConverter converter = CustomSpawners.getConverter();
 					
-					if(!(te instanceof TileEntityMobSpawner)) {
-						l.getBlock().setTypeIdAndData(52, (byte) 0, true);
-						te = cw.getTileEntityAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
-					}
-					
-					try {
-						NBTTagCompound comp = nbt.getSpawnerNBT(toApply.get(l));
-						
-						if(comp == null) {
-							continue;
-						}
-						
-						nbt.setTileEntityMobSpawnerNBT(l.getBlock(), comp);
-						toApply.remove(l);
-						
-					} catch (NotTileEntityException e) {
-						
-						customSpawners.printDebugMessage(e.getMessage(), this.getClass());
-						sendMessage(log, ChatColor.RED + "Could not find mob spawner block. Please report this to plugin author.");
-						continue;
-						
-					}
-					
+					converter.convert(spawner);
+					toApply.remove(l);
 				}
 				
 			}

@@ -29,6 +29,9 @@ public class SpawnerPlaceEvent implements Listener {
 		
 		ItemMeta meta = stack.getItemMeta();
 		
+		if(meta == null)
+			return;
+		
 		if(meta.getLore().size() < 1) {
 			return;
 		}
